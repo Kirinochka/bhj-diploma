@@ -8,8 +8,9 @@ class User {
    * Устанавливает текущего пользователя в
    * локальном хранилище.
    * */
+  static URL = '/user';
   static setCurrent(user) {
-
+    localStorage.setItem('user', user);
   }
 
   /**
@@ -17,7 +18,7 @@ class User {
    * пользователе из локального хранилища.
    * */
   static unsetCurrent() {
-
+    localStorage.removeItem('user');
   }
 
   /**
@@ -25,7 +26,7 @@ class User {
    * из локального хранилища
    * */
   static current() {
-
+    return localStorage.getItem('user');
   }
 
   /**
@@ -33,7 +34,18 @@ class User {
    * авторизованном пользователе.
    * */
   static fetch(callback) {
-
+    createRequest({
+      URL: this.URL + '/current',
+      method: 'GET',
+      callback: (err, response) => {
+        if ( response && response.user ) {
+          User.setCurrent( response.user );
+        } else {
+          this.current();
+        }
+        callback( err, response );
+      }
+    })
   }
 
   /**
@@ -64,7 +76,18 @@ class User {
    * User.setCurrent.
    * */
   static register(data, callback) {
-
+    createRequest({
+      URL: this.URL + '/register',
+      method: 'POST',
+      callback: (err, response) => {
+        if ( response && response.user ) {
+          User.setCurrent( response.user );
+        } else {
+          this.current();
+        }
+        callback( err, response );
+      }
+    })
   }
 
   /**
@@ -72,6 +95,14 @@ class User {
    * выхода необходимо вызвать метод User.unsetCurrent
    * */
   static logout(callback) {
-
+    createRequest({
+      URL: this.URL + '/logout',
+      method: 'POST',
+      callback: (err, response) => {
+        if ( response && response.user ) {
+          this.unsetCurrent();
+        }
+      }
+    })
   }
 }
