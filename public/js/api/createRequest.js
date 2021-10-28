@@ -4,7 +4,10 @@
  * */
 const createRequest = ({url, data, method, callback}) => {
   if (method === "GET") {
-    fetch(`${url}?${data.mail}&${data.password}`)
+    const urlPart = data ? '?' + Object.entries(data)
+        .map(item => item.join("=")).join('&')
+    : '';
+    fetch(`${url}${urlPart}`)
       .then(res => res.json())
       .then(res => callback(err = null, res))
       .catch(error => callback(error))

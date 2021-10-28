@@ -10,7 +10,7 @@ class User {
    * */
   static URL = '/user';
   static setCurrent(user) {
-    localStorage.setItem('user', user);
+    localStorage.setItem('user', JSON.stringify(user));
   }
 
   /**
@@ -26,7 +26,7 @@ class User {
    * из локального хранилища
    * */
   static current() {
-    return localStorage.getItem('user');
+    return JSON.parse(localStorage.getItem('user'));
   }
 
   /**
@@ -39,9 +39,9 @@ class User {
       method: 'GET',
       callback: (err, response) => {
         if ( response && response.user ) {
-          User.setCurrent( response.user );
+          this.setCurrent( response.user );
         } else {
-          this.current();
+          this.unsetCurrent();
         }
         callback( err, response );
       }
@@ -81,9 +81,7 @@ class User {
       method: 'POST',
       callback: (err, response) => {
         if ( response && response.user ) {
-          User.setCurrent( response.user );
-        } else {
-          this.current();
+          this.setCurrent( response.user );
         }
         callback( err, response );
       }
@@ -102,6 +100,7 @@ class User {
         if ( response && response.user ) {
           this.unsetCurrent();
         }
+        callback(err, response);
       }
     })
   }
