@@ -39,14 +39,20 @@ class Sidebar {
     const loginModal = App.getModal('login');
     const loginBtn = document.querySelector('.menu-item_login');
     const regBtn = document.querySelector('.menu-item_register');
-    // const logoutBtn = document.querySelector('')
+    const logoutBtn = document.querySelector('.menu-item_logout');
     regBtn.addEventListener('click', e => {
       e.preventDefault();
       registerModal.open();
-    })
+    });
     loginBtn.addEventListener('click', e => {
       e.preventDefault();
       loginModal.open();
+    });
+    logoutBtn.addEventListener('click', e => {
+      e.preventDefault();
+      User.logout((err, res) => {
+        if (res) App.setState('init');
+      })
     })
   }
 }
