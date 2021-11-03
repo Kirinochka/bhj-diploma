@@ -14,7 +14,10 @@ class AccountsWidget {
    * необходимо выкинуть ошибку.
    * */
   constructor( element ) {
-
+    if (!element) throw new Error('Пустой элемент');
+    this.element = element;
+    this.registerEvents();
+    this.update();
   }
 
   /**
@@ -25,7 +28,14 @@ class AccountsWidget {
    * вызывает AccountsWidget.onSelectAccount()
    * */
   registerEvents() {
-
+    const accBtn = this.element.querySelector('.create-account');
+    accBtn.addEventListener('click', () => {
+      App.getModal('createAccount').open();
+    });
+    this.element.addEventListener('click', ({target}) => {
+      const elem = target.closest('.account');
+      if (elem) this.onSelectAccount(elem);
+    })
   }
 
   /**
@@ -39,7 +49,13 @@ class AccountsWidget {
    * метода renderItem()
    * */
   update() {
-
+    const user = User.current();
+    if (!user) return;
+    Account.list(user, (err, res) => {
+      if (!res) return;
+      this.clear();
+      res.data.forEach(item => this.renderItem(item));
+    })
   }
 
   /**
@@ -48,7 +64,8 @@ class AccountsWidget {
    * в боковой колонке
    * */
   clear() {
-
+    const accounts = this.element.querySelectorAll('.account');
+    accounts.forEach(account => account.remove());
   }
 
   /**
@@ -59,7 +76,11 @@ class AccountsWidget {
    * Вызывает App.showPage( 'transactions', { account_id: id_счёта });
    * */
   onSelectAccount( element ) {
-
+    this.element.querySelectorAll('.account')
+      .forEach(el => el.classList.remove('active'));
+    element.classList.add('active');
+    App.showPage('transactions',
+      {'account_id': element.dataset.id});
   }
 
   /**
@@ -68,7 +89,19 @@ class AccountsWidget {
    * item - объект с данными о счёте
    * */
   getAccountHTML(item){
-
+    const {id, name, sum} = item;
+    const li = document.createElement('li');
+    const link = document.createElement('a');
+    const nameEl = document.createElement('span');
+    const sumEl = document.createElement('span');
+    li.classList.add('account');
+    li.dataset.id = id;
+    link.href = '#';
+    nameEl.textContent = name;
+    sumEl.textContent = sum;
+    link.append(nameEl, ' / ', sumEl);
+    li.append(link);
+    return li;
   }
 
   /**
@@ -78,6 +111,6 @@ class AccountsWidget {
    * и добавляет его внутрь элемента виджета
    * */
   renderItem(data){
-
+    this.element.append(this.getAccountHTML(data));
   }
 }
