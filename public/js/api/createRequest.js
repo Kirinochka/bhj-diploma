@@ -3,26 +3,35 @@
  * на сервер.
  * */
 const createRequest = ({url, data, method, callback}) => {
+  // console.log({url, data, method, callback})
+  let options = null;
+  let urlPart = '';
   if (method === "GET") {
-    const urlPart = data ? '?' + Object.entries(data)
-        .map(item => item.join("=")).join('&')
+    urlPart = data ? '?' + Object.entries(data)
+        .map(item => item.join('=')).join('&')
     : '';
-    fetch(`${url}${urlPart}`)
-      .then(res => res.json())
-      .then(res => callback(err = null, res))
-      .catch(error => callback(error))
   } else {
-    const formData = new FormData(data);
-    fetch(url, {
+    const formData = new FormData();
+    if (data) {
+      for (const [key, val] of Object.entries(data)) {
+        formData.append(key, val);
+      }
+    }
+    options = {
       method: method,
-      body: formData
-    })
+      body: formData,
+    }
+  }
+
+  fetch(url + urlPart, options)
       .then(res => res.json())
       .then(res => {
-        return callback(err = null, res)
+        console.log(res)
+        if (res.success) {
+          callback(null, res)
+        } else {
+          throw Error
+        }
       })
-      .catch(error => {
-        return callback(error)
-      })
-  }
+      .catch(error => callback(error))
 };
