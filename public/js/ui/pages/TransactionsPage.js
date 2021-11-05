@@ -203,13 +203,12 @@ class TransactionsPage {
    * */
   renderTransactions(data){
     const content = this.element.querySelector('.content');
-    if (data) {
+    if (data.length === 0) {
+      content.remove();
+    } else {
       data.forEach(item => {
         content.append(this.getTransactionHTML(item));
       })
-    } else {
-      content.remove();
     }
-
   }
 }
