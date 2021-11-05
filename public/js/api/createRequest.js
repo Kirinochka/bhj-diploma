@@ -3,7 +3,6 @@
  * на сервер.
  * */
 const createRequest = ({url, data, method, callback}) => {
-  // console.log({url, data, method, callback})
   let options = null;
   let urlPart = '';
   if (method === "GET") {
@@ -26,7 +25,6 @@ const createRequest = ({url, data, method, callback}) => {
   fetch(url + urlPart, options)
       .then(res => res.json())
       .then(res => {
-        console.log(res)
         if (res.success) {
           callback(null, res)
         } else {
