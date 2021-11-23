@@ -33,20 +33,11 @@ class TransactionsPage {
    * TransactionsPage.removeAccount соответственно
    * */
   registerEvents() {
-    // const removeBtn = this.element.querySelector('.remove-account');
-    // const transactionBtn = this.element.querySelector('.transaction__remove');
-    // removeBtn.addEventListener('click', () => {
-    //   this.removeAccount();
-    // });
-    // transactionBtn && transactionBtn.addEventListener('click', () => {
-    //   console.log(transactionBtn.dataset.id)
-    //   this.removeTransaction(transactionBtn.dataset.id)
-    // });
     this.element.addEventListener('click', ({target}) => {
-      if (target.matches('.remove-account')) {
+      if (target.closest('.remove-account')) {
         this.removeAccount();
       }
-      if (target.matches('.transaction__remove')) {
+      if (target.closest('.transaction__remove')) {
         this.removeTransaction(target.dataset.id);
       }
     })
@@ -65,7 +56,7 @@ class TransactionsPage {
     if (!this.lastOptions) return;
     const isDelete = confirm('Вы действительно хотите удалить счёт?');
     if (isDelete) {
-      Account.remove(this.lastOptions, (err, res) => {
+      Account.remove({id: this.lastOptions.account_id}, (err, res) => {
         console.log(err)
         if (!res) return;
         App.updateWidgets();
@@ -83,7 +74,7 @@ class TransactionsPage {
   removeTransaction( id ) {
     const isDelete = confirm('Вы действительно хотите удалить транзакцию?');
     if (isDelete) {
-      Transaction.remove(id, (err, res) => {
+      Transaction.remove({ id: id}, (err, res) => {
         if (!res) return;
         App.update();
       })
@@ -166,10 +157,10 @@ class TransactionsPage {
   getTransactionHTML(item){
     const { created_at, id, name, sum, type } = item;
     const date = this.formatDate(created_at);
-    const transationClass = type === 'income' ? 'transaction_expense' : 'transaction_income';
+    const transactionClass = type === 'income' ? 'transaction_income' : 'transaction_expense';
     const template = document.createElement('template');
     template.innerHTML = `
-      <div class="transaction ${transationClass} row">
+      <div class="transaction ${transactionClass} row">
         <div class="col-md-7 transaction__details">
           <div class="transaction__icon">
               <span class="fa fa-money fa-2x"></span>
@@ -204,8 +195,9 @@ class TransactionsPage {
   renderTransactions(data){
     const content = this.element.querySelector('.content');
     if (data.length === 0) {
-      content.remove();
+      content.innerHTML = "";
     } else {
+      content.innerHTML = "";
       data.forEach(item => {
         content.append(this.getTransactionHTML(item));
       })
